@@ -13,9 +13,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -25,6 +27,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -46,6 +50,8 @@ import com.senada.music.ui.screens.PermissionRequestScreen
 import com.senada.music.ui.screens.ScanningScreen
 import com.senada.music.ui.screens.SearchScreen
 import com.senada.music.ui.screens.SongsScreen
+import com.senada.music.ui.theme.BgBottom
+import com.senada.music.ui.theme.Cream
 
 @Composable
 fun SenadaApp(
@@ -225,6 +231,21 @@ fun SenadaApp(
                                 .padding(bottom = 160.dp)
                         )
                     }
+
+                    // Scrim difusi lembut di belakang floating dock untuk efek frosted glass yang realistis
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .align(Alignment.BottomCenter)
+                            .background(
+                                Brush.verticalGradient(
+                                    0.0f to Color.Transparent,
+                                    0.4f to Cream.copy(alpha = 0.35f),
+                                    1.0f to Cream.copy(alpha = 0.85f)
+                                )
+                            )
+                    )
 
                     // Floating Dock (Mini Player + Navigasi)
                     FloatingDock(

@@ -85,7 +85,8 @@ class MediaStoreMusicRepository(
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DATE_ADDED,
-            MediaStore.Audio.Media.SIZE
+            MediaStore.Audio.Media.SIZE,
+            MediaStore.Audio.Media.ALBUM_ID
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -116,6 +117,7 @@ class MediaStoreMusicRepository(
                 val durationCol = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
                 val dateAddedCol = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
                 val sizeCol = it.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
+                val albumIdCol = it.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)
 
                 val bucketNameCol = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     it.getColumnIndex(MediaStore.Audio.Media.BUCKET_DISPLAY_NAME)
@@ -141,6 +143,7 @@ class MediaStoreMusicRepository(
                     val duration = it.getLong(durationCol)
                     val dateAdded = it.getLong(dateAddedCol)
                     val size = it.getLong(sizeCol)
+                    val albumId = if (albumIdCol >= 0) it.getLong(albumIdCol) else 0L
 
                     val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
@@ -180,7 +183,8 @@ class MediaStoreMusicRepository(
                             folderName = folderName,
                             bucketId = bucketId,
                             volumePath = volumePath,
-                            sizeBytes = size
+                            sizeBytes = size,
+                            albumId = albumId
                         )
                     )
                 }

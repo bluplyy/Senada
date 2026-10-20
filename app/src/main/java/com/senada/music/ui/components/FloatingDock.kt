@@ -24,13 +24,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.outlined.Audiotrack
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -55,17 +55,20 @@ import com.senada.music.ui.theme.NavLabelStyle
 import com.senada.music.ui.theme.Pink
 import com.senada.music.ui.theme.SongTitleStyle
 
-enum class NavTab(val title: String, val icon: ImageVector) {
-    HOME("Home", Icons.Default.Home),
-    LAGU("Lagu", Icons.Default.MusicNote),
-    FOLDER("Folder", Icons.Default.Folder),
-    CARI("Cari", Icons.Default.Search)
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
+enum class NavTab(val title: String, val iconRes: Int) {
+    HOME("Home", com.senada.music.R.drawable.ic_lucide_house),
+    LAGU("Lagu", com.senada.music.R.drawable.ic_lucide_music2),
+    FOLDER("Folder", com.senada.music.R.drawable.ic_lucide_folder),
+    CARI("Cari", com.senada.music.R.drawable.ic_lucide_search)
 }
 
 /**
- * Mini Player liquid glass (tinggi 72 dp, radius 24 dp):
- * Thumbnail 48 dp, teks judul & artis, kontrol jeda/putar dan berikutnya.
- * Ketuk metadata membuka pemutar penuh tanpa menghentikan musik.
+ * Mini Player liquid glass (w: 380dp, h: 72dp, radius 24dp):
+ * Thumbnail 48dp (radius 12dp), teks judul 14sp semibold & artis 12sp, kontrol jeda/putar dan berikutnya 23dp.
  */
 @Composable
 fun MiniPlayer(
@@ -87,16 +90,16 @@ fun MiniPlayer(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             SongArtwork(
+                song = song,
                 bitmap = artworkBitmap,
                 modifier = Modifier.size(48.dp),
                 cornerRadius = 12.dp
             )
-
-            Spacer(modifier = Modifier.width(10.dp))
 
             Column(
                 modifier = Modifier
@@ -106,18 +109,25 @@ fun MiniPlayer(
                         contentDescription = "Buka pemutar penuh. Sedang memutar ${song.title} oleh ${song.displayArtist}"
                         role = Role.Button
                     },
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
             ) {
                 Text(
                     text = song.title,
-                    style = SongTitleStyle,
+                    style = SongTitleStyle.copy(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Ink
+                    ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = song.displayArtist,
-                    style = MetadataStyle,
+                    style = MetadataStyle.copy(
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Muted
+                    ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -128,10 +138,13 @@ fun MiniPlayer(
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
-                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    painter = androidx.compose.ui.res.painterResource(
+                        if (isPlaying) com.senada.music.R.drawable.ic_lucide_pause
+                        else com.senada.music.R.drawable.ic_lucide_play
+                    ),
                     contentDescription = if (isPlaying) "Jeda musik" else "Putar musik",
                     tint = Ink,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(23.dp)
                 )
             }
 
@@ -140,10 +153,10 @@ fun MiniPlayer(
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.SkipNext,
+                    painter = androidx.compose.ui.res.painterResource(com.senada.music.R.drawable.ic_lucide_skip_forward),
                     contentDescription = "Lagu berikutnya",
                     tint = Ink,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(23.dp)
                 )
             }
         }
@@ -151,9 +164,11 @@ fun MiniPlayer(
 }
 
 /**
- * Navigasi bawah liquid glass (tinggi 80 dp, radius 24 dp):
+ * Navigasi bawah liquid glass (tinggi 80 dp, radius 24 dp, p: 8dp, gap: 4dp):
  * 4 menu: Home, Lagu, Folder, Cari.
- * Item aktif memiliki kapsul latar Pink #F6B0BB.
+ * Item: h: 64dp, radius 18dp.
+ * Item aktif (Home) memiliki latar Pink #F6B0BB, semibold 11sp, icon 22dp, gap: 4dp.
+ * Item non-aktif memiliki latar transparan, normal 11sp, icon 22dp, gap: 4dp.
  */
 @Composable
 fun BottomNavigationDock(
@@ -171,21 +186,23 @@ fun BottomNavigationDock(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             NavTab.entries.forEach { tab ->
                 val isSelected = tab == currentTab
                 val itemModifier = if (isSelected) {
                     Modifier
-                        .clip(RoundedCornerShape(20.dp))
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(18.dp))
                         .background(Pink)
-                        .padding(horizontal = 20.dp, vertical = 8.dp)
                 } else {
                     Modifier
-                        .clip(RoundedCornerShape(20.dp))
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(18.dp))
                         .clickable { onTabSelected(tab) }
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
                 }
 
                 Column(
@@ -198,16 +215,18 @@ fun BottomNavigationDock(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
-                        imageVector = tab.icon,
+                        painter = androidx.compose.ui.res.painterResource(tab.iconRes),
                         contentDescription = null,
-                        tint = if (isSelected) Ink else Muted,
-                        modifier = Modifier.size(24.dp)
+                        tint = Ink,
+                        modifier = Modifier.size(22.dp)
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = tab.title,
                         style = NavLabelStyle.copy(
-                            color = if (isSelected) Ink else Muted
+                            fontSize = 11.sp,
+                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                            color = Ink
                         )
                     )
                 }

@@ -16,7 +16,8 @@ data class Song(
     val folderName: String,
     val bucketId: String,
     val volumePath: String = "Penyimpanan internal",
-    val sizeBytes: Long = 0L
+    val sizeBytes: Long = 0L,
+    val albumId: Long = 0L
 ) {
     constructor(
         id: Long,
@@ -28,7 +29,8 @@ data class Song(
         folderName: String,
         bucketId: String,
         volumePath: String = "Penyimpanan internal",
-        sizeBytes: Long = 0L
+        sizeBytes: Long = 0L,
+        albumId: Long = 0L
     ) : this(
         id = id,
         title = title,
@@ -39,7 +41,8 @@ data class Song(
         folderName = folderName,
         bucketId = bucketId,
         volumePath = volumePath,
-        sizeBytes = sizeBytes
+        sizeBytes = sizeBytes,
+        albumId = albumId
     )
 
     val contentUri: Uri

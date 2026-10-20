@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CropFree
 import androidx.compose.material.icons.filled.Lock
@@ -68,11 +71,12 @@ fun PermissionRequestScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "senada",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF566346)
+        Image(
+            painter = painterResource(com.senada.music.R.drawable.ic_logo_senada),
+            contentDescription = "senada",
+            modifier = Modifier.height(28.dp),
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.CenterStart
         )
 
         Column(
@@ -151,11 +155,12 @@ fun PermissionDeniedScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "senada",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF566346)
+        Image(
+            painter = painterResource(com.senada.music.R.drawable.ic_logo_senada),
+            contentDescription = "senada",
+            modifier = Modifier.height(28.dp),
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.CenterStart
         )
 
         Column(
@@ -256,11 +261,12 @@ fun ScanningScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "senada",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF566346)
+        Image(
+            painter = painterResource(com.senada.music.R.drawable.ic_logo_senada),
+            contentDescription = "senada",
+            modifier = Modifier.height(28.dp),
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.CenterStart
         )
 
         Column(
@@ -329,11 +335,12 @@ fun EmptyCollectionScreen(
             .padding(horizontal = 24.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "senada",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF566346)
+        Image(
+            painter = painterResource(com.senada.music.R.drawable.ic_logo_senada),
+            contentDescription = "senada",
+            modifier = Modifier.height(28.dp),
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.CenterStart
         )
 
         Column(

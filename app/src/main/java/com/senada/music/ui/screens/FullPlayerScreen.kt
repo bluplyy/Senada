@@ -145,6 +145,7 @@ fun FullPlayerScreen(
                 contentAlignment = Alignment.Center
             ) {
                 SongArtwork(
+                    song = song,
                     bitmap = artworkBitmap,
                     modifier = Modifier.fillMaxSize(),
                     cornerRadius = 24.dp

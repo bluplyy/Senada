@@ -36,6 +36,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +44,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.senada.music.data.artwork.ArtworkLoader
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -105,7 +109,8 @@ fun SenadaBackground(
 }
 
 /**
- * Surface liquid glass dengan border putih 70%, bayangan halus, dan fallback semi-transparan.
+ * Surface liquid / frosted glass dengan bayangan lembut, lapisan frosted milky,
+ * specular light highlight gradient, dan border kaca berpendar.
  */
 @Composable
 fun GlassSurface(
@@ -116,10 +121,33 @@ fun GlassSurface(
 ) {
     Box(
         modifier = modifier
-            .shadow(elevation = 8.dp, shape = shape, spotColor = GlassShadow, ambientColor = GlassShadow)
+            .shadow(
+                elevation = 12.dp,
+                shape = shape,
+                spotColor = Color(0x243F4930),
+                ambientColor = Color(0x183F4930)
+            )
             .clip(shape)
-            .background(GlassFill)
-            .border(width = 1.dp, color = GlassBorder, shape = shape)
+            // Frosted glass base: susu krem hangat semi-transparan (#FFF9F0 ~85% opacity)
+            .background(Color(0xD9FFF9F0))
+            // Frosted specular sheen: pantulan cahaya kaca dari atas ke bawah
+            .background(
+                brush = Brush.verticalGradient(
+                    0.0f to Color(0x80FFFFFF),
+                    0.35f to Color(0x33FFFFFF),
+                    1.0f to Color(0x14FFFFFF)
+                )
+            )
+            // Frosted glass border: garis batas kaca putih bening dengan pantulan atas
+            .border(
+                width = 1.dp,
+                brush = Brush.verticalGradient(
+                    0.0f to Color(0xF2FFFFFF),
+                    0.6f to Color(0x99FFFFFF),
+                    1.0f to Color(0x66FFFFFF)
+                ),
+                shape = shape
+            )
     ) {
         content()
     }
@@ -154,17 +182,31 @@ fun FallbackArtwork(
 }
 
 /**
- * Artwork lokal lagu: menampilkan gambar album jika tersedia, atau gradasi fallback.
+ * Artwork lokal lagu: menampilkan gambar album lokal jika tersedia, atau memuatnya secara asinkron dari MediaStore/ID3, dengan gradasi fallback.
  */
 @Composable
 fun SongArtwork(
-    bitmap: Bitmap?,
+    song: Song? = null,
+    bitmap: Bitmap? = null,
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 12.dp
 ) {
-    if (bitmap != null) {
+    val context = LocalContext.current
+    var loadedBitmap by remember(song?.id) {
+        mutableStateOf(song?.let { ArtworkLoader.getInstance(context).getCachedArtwork(it.id) })
+    }
+
+    LaunchedEffect(song?.id) {
+        if (bitmap == null && song != null && loadedBitmap == null) {
+            val loader = ArtworkLoader.getInstance(context)
+            loadedBitmap = loader.getCachedArtwork(song.id) ?: loader.loadArtwork(song.id, song.contentUri, song.albumId, 128)
+        }
+    }
+
+    val displayBitmap = bitmap ?: loadedBitmap
+    if (displayBitmap != null) {
         Image(
-            bitmap = bitmap.asImageBitmap(),
+            bitmap = displayBitmap.asImageBitmap(),
             contentDescription = "Sampul album",
             modifier = modifier.clip(RoundedCornerShape(cornerRadius)),
             contentScale = ContentScale.Crop
@@ -220,6 +262,7 @@ fun SongRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         SongArtwork(
+            song = song,
             bitmap = artworkBitmap,
             modifier = Modifier.size(56.dp)
         )

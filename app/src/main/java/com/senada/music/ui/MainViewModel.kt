@@ -34,7 +34,7 @@ enum class PermissionStatus {
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: MusicRepository = MediaStoreMusicRepository(application)
-    val artworkLoader = ArtworkLoader(application)
+    val artworkLoader = ArtworkLoader.getInstance(application)
     val playerController = MusicPlayerController(application, viewModelScope)
 
     private val _permissionStatus = MutableStateFlow(PermissionStatus.INITIAL)
@@ -66,18 +66,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _activeArtworkColors = MutableStateFlow(ArtworkColors.Default)
     val activeArtworkColors: StateFlow<ArtworkColors> = _activeArtworkColors.asStateFlow()
 
-    // Cache bitmap untuk thumbnail di memori
-    private val artworkCache = mutableMapOf<Long, Bitmap?>()
-
     init {
         // Pantau lagu aktif untuk memuat artwork dan warna gradasi
         viewModelScope.launch {
             playbackState.collectLatest { state ->
                 val activeSong = state.activeSong
                 if (activeSong != null) {
-                    val bitmap = artworkLoader.loadArtwork(activeSong.id, activeSong.contentUri, 512)
+                    val bitmap = artworkLoader.loadArtwork(activeSong.id, activeSong.contentUri, activeSong.albumId, 512)
                     _activeArtworkBitmap.value = bitmap
-                    val colors = artworkLoader.extractColors(activeSong.id, activeSong.contentUri)
+                    val colors = artworkLoader.extractColors(activeSong.id, activeSong.contentUri, activeSong.albumId)
                     _activeArtworkColors.value = colors
                 } else {
                     _activeArtworkBitmap.value = null
@@ -134,15 +131,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getArtworkForSong(songId: Long): Bitmap? {
-        return artworkCache[songId]
+        return artworkLoader.getCachedArtwork(songId)
     }
 
     fun prefetchArtwork(song: Song) {
-        if (!artworkCache.containsKey(song.id)) {
-            viewModelScope.launch {
-                val bmp = artworkLoader.loadArtwork(song.id, song.contentUri, 128)
-                artworkCache[song.id] = bmp
-            }
+        viewModelScope.launch {
+            artworkLoader.loadArtwork(song.id, song.contentUri, song.albumId, 128)
         }
     }
 

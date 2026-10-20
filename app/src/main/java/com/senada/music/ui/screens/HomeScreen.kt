@@ -1,6 +1,7 @@
 package com.senada.music.ui.screens
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,12 +61,13 @@ fun HomeScreen(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Branding header "senada"
-        Text(
-            text = "senada",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF566346)
+        // Branding header logo "senada" (dari aset Group 3.png)
+        Image(
+            painter = painterResource(com.senada.music.R.drawable.ic_logo_senada),
+            contentDescription = "senada",
+            modifier = Modifier.height(28.dp),
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.CenterStart
         )
 
         Spacer(modifier = Modifier.height(4.dp))

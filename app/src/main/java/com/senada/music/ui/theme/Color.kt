@@ -16,10 +16,10 @@ val Action = Color(0xFF596749)       // Aksi kontras (tombol izinkan/buka pengat
 val Pink = Color(0xFFF6B0BB)         // Pink aktif (seleksi menu & status kontrol aktif)
 val PinkSoft = Color(0xFFF1C8CB)     // Pink lembut (aksen pendukung / fallback artwork)
 
-// Material Kaca (Liquid glass)
-val GlassFill = Color(0x8CFFF9F0)    // #FFF9F0 dengan transparansi 55%
-val GlassBorder = Color(0xB3FFFFFF)  // Putih dengan transparansi 70%
-val GlassShadow = Color(0x123F4930)  // y4 / blur16 / #3F493012
+// Material Kaca (Liquid glass / Frosted glass sesuai desain pen.dev)
+val GlassFill = Color(0x8CFFF9F0)    // #FFF9F08C (bg-[#FFF9F08C])
+val GlassBorder = Color(0xB3FFFFFF)  // #FFFFFFB3 (outline: 1px solid #FFFFFFB3)
+val GlassShadow = Color(0x123F4930)  // #3F493012 (box-shadow: 0px 4px 16px #3F493012)
 
 // Kontrol & State
 val ControlInactive = Color(0xFFE6E0D6) // Kontrol nonaktif (shuffle / repeat)

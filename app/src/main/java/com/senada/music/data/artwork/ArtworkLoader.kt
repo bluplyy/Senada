@@ -46,8 +46,19 @@ data class ArtworkColors(
  */
 class ArtworkLoader(private val context: Context) {
 
+    companion object {
+        @Volatile
+        private var instance: ArtworkLoader? = null
+
+        fun getInstance(context: Context): ArtworkLoader {
+            return instance ?: synchronized(this) {
+                instance ?: ArtworkLoader(context.applicationContext).also { instance = it }
+            }
+        }
+    }
+
     private val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
-    private val cacheSize = maxMemory / 8
+    private val cacheSize = maxMemory / 6 // 1/6 memori untuk cache gambar lokal
 
     private val bitmapCache = object : LruCache<Long, Bitmap>(cacheSize) {
         override fun sizeOf(key: Long, bitmap: Bitmap): Int {
@@ -57,20 +68,29 @@ class ArtworkLoader(private val context: Context) {
 
     private val colorCache = LruCache<Long, ArtworkColors>(64)
 
-    suspend fun loadArtwork(songId: Long, uri: Uri, targetSize: Int = 512): Bitmap? = withContext(Dispatchers.IO) {
+    fun getCachedArtwork(songId: Long): Bitmap? {
+        return bitmapCache.get(songId)
+    }
+
+    suspend fun loadArtwork(
+        songId: Long,
+        uri: Uri,
+        albumId: Long = 0L,
+        targetSize: Int = 512
+    ): Bitmap? = withContext(Dispatchers.IO) {
         bitmapCache.get(songId)?.let { return@withContext it }
 
-        val bitmap = loadBitmapFromUri(uri, targetSize)
+        val bitmap = loadBitmapFromUri(uri, albumId, targetSize)
         if (bitmap != null) {
             bitmapCache.put(songId, bitmap)
         }
         bitmap
     }
 
-    suspend fun extractColors(songId: Long, uri: Uri): ArtworkColors = withContext(Dispatchers.IO) {
+    suspend fun extractColors(songId: Long, uri: Uri, albumId: Long = 0L): ArtworkColors = withContext(Dispatchers.IO) {
         colorCache.get(songId)?.let { return@withContext it }
 
-        val bitmap = loadArtwork(songId, uri, targetSize = 128)
+        val bitmap = loadArtwork(songId, uri, albumId, targetSize = 128)
         if (bitmap == null) {
             return@withContext ArtworkColors.Default
         }
@@ -102,15 +122,36 @@ class ArtworkLoader(private val context: Context) {
         colors
     }
 
-    private fun loadBitmapFromUri(uri: Uri, targetSize: Int): Bitmap? {
-        // Coba ContentResolver.loadThumbnail pada API 29+
+    private fun loadBitmapFromUri(uri: Uri, albumId: Long, targetSize: Int): Bitmap? {
+        // 1. Coba ContentResolver.loadThumbnail pada API 29+ (sangat cepat & didukung Android)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             try {
-                return context.contentResolver.loadThumbnail(uri, Size(targetSize, targetSize), null)
+                val thumb = context.contentResolver.loadThumbnail(uri, Size(targetSize, targetSize), null)
+                if (thumb != null) return thumb
             } catch (ignored: Exception) {}
         }
 
-        // Fallback menggunakan MediaMetadataRetriever
+        // 2. Fallback MediaStore album art URI jika albumId tersedia
+        if (albumId > 0) {
+            try {
+                val albumArtUri = android.content.ContentUris.withAppendedId(
+                    Uri.parse("content://media/external/audio/albumart"),
+                    albumId
+                )
+                context.contentResolver.openInputStream(albumArtUri)?.use { stream ->
+                    val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    BitmapFactory.decodeStream(stream, null, options)
+                    options.inSampleSize = calculateInSampleSize(options, targetSize, targetSize)
+                    options.inJustDecodeBounds = false
+                    context.contentResolver.openInputStream(albumArtUri)?.use { stream2 ->
+                        val bmp = BitmapFactory.decodeStream(stream2, null, options)
+                        if (bmp != null) return bmp
+                    }
+                }
+            } catch (ignored: Exception) {}
+        }
+
+        // 3. Fallback menggunakan MediaMetadataRetriever (embedded ID3 APIC picture)
         var retriever: MediaMetadataRetriever? = null
         try {
             retriever = MediaMetadataRetriever()
