@@ -7,6 +7,10 @@ Implementasi ini dibangun secara presisi mengacu pada dokumen desain:
 - **Perilaku & Handoff**: `rU68D` (*06 / Perilaku, aksesibilitas & handoff*)
 - **15 Frame Spesifikasi**: Frame `01` hingga `14` serta frame `18` (pemutar jeda/gelap).
 
+[![Download APK](https://img.shields.io/badge/Download-APK%20(v1.0.0)-596749?style=for-the-badge&logo=android&logoColor=white)](https://github.com/bluplyy/Senada/releases/latest)
+
+> **📲 [Klik di sini untuk Download Senada.apk langsung di HP](https://github.com/bluplyy/Senada/releases/latest)**
+
 ---
 
 ## 📱 Fitur Utama & Kesesuaian Desain
