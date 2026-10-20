@@ -239,15 +239,16 @@ fun FloatingDock(
 
     AnimatedVisibility(
         visible = !isKeyboardVisible,
-        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
-        exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+        exit = fadeOut() + slideOutVertically(targetOffsetY = { it }),
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .windowInsetsPadding(WindowInsets.navigationBars)
-                .padding(bottom = 8.dp),
+                .padding(bottom = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if (activeSong != null) {

@@ -73,7 +73,7 @@ fun FoldersScreen(
         Text(
             text = "Mengikuti penyimpanan perangkat.\nIsi diperbarui otomatis saat file berubah.",
             style = MetadataStyle,
-            modifier = Modifier.padding(bottom = 170.dp, start = 4.dp)
+            modifier = Modifier.padding(bottom = 200.dp, start = 4.dp)
         )
     }
 }

@@ -185,7 +185,7 @@ fun SearchScreen(
 
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 170.dp),
+                    contentPadding = PaddingValues(bottom = 200.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     items(
